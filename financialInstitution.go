@@ -14,6 +14,7 @@ type FinancialInstitution struct {
 	IdOther                     string                `json:"idother"`
 	OpenTransactions            []*PaymentTransaction `json:"opentransactions"`
 	ReceivedPaymentInstructions []*PaymentInstruction `json:"received"`
+	PaymentInstructionsToBeSent []*PaymentInstruction `json:"tbsent"`
 }
 
 type financialInstitutionProcessing interface {
