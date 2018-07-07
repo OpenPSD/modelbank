@@ -49,8 +49,8 @@ type financialInstitutionProcessing interface {
 	GetAccounts() []Account
 }
 
-func (fi FinancialInstitution) GetAccounts() []*Account {
-	var accounts []*Account
+func (fi FinancialInstitution) GetAccounts() []Account {
+	var accounts []Account
 
 	acholders := fi.Customers
 
@@ -58,8 +58,7 @@ func (fi FinancialInstitution) GetAccounts() []*Account {
 		cust := acholders[i]
 		custAccnts := cust.Accounts
 		for j := 0; j < len(custAccnts); j++ {
-			acct := custAccnts[j]
-
+			acct := *custAccnts[j]
 			accounts = append(accounts, acct)
 		}
 	}
