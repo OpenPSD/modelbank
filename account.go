@@ -20,6 +20,7 @@ type AccountHolder struct {
 	IdPersProvinceOfBirth string                `json:"birthprovince"`
 	IdPersCityOfBirth     string                `json:"birthcity"`
 	IdPersCountryOfBirth  string                `json:"birthcountry"`
+	Accounts              []*Account            `json:"accounts"`
 }
 
 type Account struct {
@@ -28,7 +29,30 @@ type Account struct {
 	Bic           string         `json:"bic"`
 	Currency      string         `json:"currency"`
 	Balance       float64        `json:"balance"`
+	Limit         float64        `json:"limit"`
 	OpeningDate   time.Time      `json:"opening"`
+	ClosingDate   time.Time      `json:"closing"`
+	Ledger        []*LedgerEntry `json:"Ledger"`
+	Status        string         `json:"status"`
+}
+
+type accountProcessing interface {
+	setLimit(value float64)
+	debitAccount(amount float64)
+	creditAccount(amount float64)
+	isAccountCoverageSufficient() bool
+}
+
+type accountHolderProcessing interface {
+	openAccount(accountHolder AccountHolder, currency string) *Account
+	closeAccount()
+	intructPayment(crdtrName string,
+		crdtrIban string,
+		crdtBic string,
+		crdtAmnt float64,
+		crdtCrrncy string,
+		purpose string,
+		reqExecDate time.Time, dbtrAccnt *Account) *PaymentTransaction
 }
 
 func NewAccount(accountHolder AccountHolder) Account {

@@ -5,24 +5,25 @@ import (
 	"time"
 )
 
-type Ledger struct {
+type LedgerEntry struct {
 	RelatedAccount *Account  `json:"related"`
 	EntryType      string    `json:"type"` // credit,debit
 	EntryDate      time.Time `json:"date"`
 	EntryAmount    float64   `json:"amount"`
 	EntryTitle     string    `json:"title"`
+	EntryStatus    string    `json:"status"`
 }
 
-func NewLedger(account Account) Ledger {
+func NewLedgerEntry(account Account) LedgerEntry {
 	a := &account
 
-	return Ledger{
+	return LedgerEntry{
 		RelatedAccount: a,
 	}
 }
 
 // Marshal interface implementation
-func (m *Ledger) Marshal() ([]byte, error) {
+func (m *LedgerEntry) Marshal() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -30,8 +31,8 @@ func (m *Ledger) Marshal() ([]byte, error) {
 }
 
 // Unmarshal interface implementation
-func (m *Ledger) Unmarshal(b []byte) error {
-	var res Ledger
+func (m *LedgerEntry) Unmarshal(b []byte) error {
+	var res LedgerEntry
 	if err := json.Unmarshal(b, &res); err != nil {
 		return err
 	}
