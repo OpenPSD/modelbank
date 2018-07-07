@@ -15,6 +15,7 @@ type FinancialInstitution struct {
 	OpenTransactions            []*PaymentTransaction `json:"opentransactions"`
 	ReceivedPaymentInstructions []*PaymentInstruction `json:"received"`
 	PaymentInstructionsToBeSent []*PaymentInstruction `json:"tbsent"`
+	Customers                   []*AccountHolder      `json:"customers"`
 }
 
 type financialInstitutionProcessing interface {
@@ -44,6 +45,26 @@ type financialInstitutionProcessing interface {
 	// takes all existing paymenttransactions created by accountholders and creates
 	// outgoing paymentInstructions. Books all payment transactions on accounts's ledgers.
 	createOutgoingPaymentInstructions()
+
+	GetAccounts() []Account
+}
+
+func (fi FinancialInstitution) GetAccounts() []*Account {
+	var accounts []*Account
+
+	acholders := fi.Customers
+
+	for i := 0; i < len(acholders); i++ {
+		cust := acholders[i]
+		custAccnts := cust.Accounts
+		for j := 0; j < len(custAccnts); j++ {
+			acct := custAccnts[j]
+
+			accounts = append(accounts, acct)
+		}
+	}
+
+	return accounts
 }
 
 func NewFinancialInstitution() FinancialInstitution {
