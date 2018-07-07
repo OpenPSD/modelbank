@@ -18,6 +18,7 @@ type PaymentInstruction struct {
 	UltimateDebtor         *AccountHolder        `json:"ultimatedebtor"`
 	ChargeBearer           string                `json:"chargebearer"`
 	Transactions           []*PaymentTransaction `json:"transactions"`
+	Status                 string                `json:"status"` //new, processed
 }
 
 type PaymentTransaction struct {
@@ -31,6 +32,7 @@ type PaymentTransaction struct {
 	UltimateCreditor      *AccountHolder        `json:"ultimatecreditor"`
 	Purpose               string                `json:"purpose"`
 	RemittanceInformation string                `json:"remittance"`
+	Status                string                `json:"status"` // new, processed
 }
 
 func NewPaymentInstruction(debtor AccountHolder,

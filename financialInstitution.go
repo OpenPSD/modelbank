@@ -6,12 +6,14 @@ import (
 )
 
 type FinancialInstitution struct {
-	Name         string `json:"name"`
-	Country      string `json:"country"`
-	AddressLine1 string `json:"address1"`
-	AddressLine2 string `json:"address2"`
-	Bic          string `json:"bic"`
-	IdOther      string `json:"idother"`
+	Name                        string                `json:"name"`
+	Country                     string                `json:"country"`
+	AddressLine1                string                `json:"address1"`
+	AddressLine2                string                `json:"address2"`
+	Bic                         string                `json:"bic"`
+	IdOther                     string                `json:"idother"`
+	OpenTransactions            []*PaymentTransaction `json:"opentransactions"`
+	ReceivedPaymentInstructions []*PaymentInstruction `json:"received"`
 }
 
 type financialInstitutionProcessing interface {
