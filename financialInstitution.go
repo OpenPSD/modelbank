@@ -23,9 +23,23 @@ type financialInstitutionProcessing interface {
 	onboardOrganisation(name string,
 		address string,
 		tin string) *AccountHolder
+
+	// receivePaymentInstruction
+	// receives incoming paymentinstructions from other banks and stores them
+	// for further processing.
 	receivePaymentInstruction(paymentInstruction PaymentInstruction)
+
+	// sendPaymentInstruction
+	// sends outgoing paymentinstructions to other banks.
 	sendPaymentInstruction(paymentInstruction PaymentInstruction)
+
+	// processIncomingPaymentInstructions
+	// books all received incoming paymentinstructions to corresponding accounts' ledgers.
 	processIncomingPaymentInstructions()
+
+	// createOutgoingPaymentInstructions
+	// takes all existing paymenttransactions created by accountholders and creates
+	// outgoing paymentInstructions. Books all payment transactions on accounts's ledgers.
 	createOutgoingPaymentInstructions()
 }
 
