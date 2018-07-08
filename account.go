@@ -61,6 +61,42 @@ type accountHolderProcessing interface {
 		reqExecDate time.Time, dbtrAccnt *Account) *PaymentTransaction
 }
 
+func (ah AccountHolder) instructPayment(crdtrName string,
+	crdtrIban string,
+	crdtBic string,
+	crdtAmnt float64,
+	crdtCrrncy string,
+	purpose string,
+	reqExecDate time.Time, dbtrAccnt *Account) *PaymentTransaction {
+
+	var pt PaymentTransaction
+
+	crdtAgnt := NewFinancialInstitution()
+	crdtAgnt.Bic = crdtBic
+	crdtr := NewAccountHolder(crdtAgnt)
+	crdtr.Name = crdtrName
+	crdtrAccnt := NewAccount(crdtr)
+	crdtrAccnt.Bic = crdtBic
+	crdtrAccnt.Iban = crdtrIban
+	crdtrAccnt.Currency = crdtCrrncy
+	pt = NewPaymentTransaction(crdtr, crdtrAccnt, crdtAgnt)
+	pt.Amount = crdtAmnt
+	pt.Purpose = purpose
+
+	pi := NewPaymentInstruction(*dbtrAccnt.AccountHolder, *dbtrAccnt, *dbtrAccnt.AccountHolder.Agent)
+	pi.RequestedExecutionDate = reqExecDate
+	pi.Status = New
+
+	pi.Transactions = append(pi.Transactions, &pt)
+	pi.Status = New
+	pt.PaymentInstruction = &pi
+
+	openTx := dbtrAccnt.AccountHolder.Agent.OpenTransactions
+	openTx = append(openTx, &pt)
+
+	return &pt
+}
+
 func NewAccount(accountHolder AccountHolder) Account {
 	a := &accountHolder
 	return Account{

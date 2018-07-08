@@ -5,6 +5,11 @@ import (
 	"time"
 )
 
+const (
+	New       = "new"
+	Processed = "Processed"
+)
+
 type PaymentInstruction struct {
 	PaymentInstructionId   string                `json:"id"`
 	PaymentMethod          string                `json:"method"`
@@ -22,6 +27,7 @@ type PaymentInstruction struct {
 }
 
 type PaymentTransaction struct {
+	PaymentInstruction    *PaymentInstruction   `json:"instruction"`
 	PaymentId             string                `json:"id"`
 	Amount                float64               `json:"amount"`
 	ChargeBearer          string                `json:"chargebearer"`

@@ -24,6 +24,7 @@ type financialInstitutionProcessing interface {
 		dateOfBirth time.Time,
 		cityOfBirth string,
 		countryOfBirth string) *AccountHolder
+
 	onboardOrganisation(name string,
 		address string,
 		tin string) *AccountHolder
@@ -39,6 +40,8 @@ type financialInstitutionProcessing interface {
 
 	// processIncomingPaymentInstructions
 	// books all received incoming paymentinstructions to corresponding accounts' ledgers.
+	// Incoming paymentinstructions can either be received from other financial institutions or
+	// created by accountholders wihin the same bank.
 	processIncomingPaymentInstructions()
 
 	// createOutgoingPaymentInstructions
@@ -52,10 +55,10 @@ type financialInstitutionProcessing interface {
 func (fi FinancialInstitution) GetAccounts() []Account {
 	var accounts []Account
 
-	acholders := fi.Customers
+	accntholders := fi.Customers
 
-	for i := 0; i < len(acholders); i++ {
-		cust := acholders[i]
+	for i := 0; i < len(accntholders); i++ {
+		cust := accntholders[i]
 		custAccnts := cust.Accounts
 		for j := 0; j < len(custAccnts); j++ {
 			acct := *custAccnts[j]
