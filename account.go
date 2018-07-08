@@ -61,7 +61,7 @@ type accountHolderProcessing interface {
 		reqExecDate time.Time, dbtrAccnt *Account) *PaymentTransaction
 }
 
-func (ah AccountHolder) instructPayment(crdtrName string,
+func (ah *AccountHolder) instructPayment(crdtrName string,
 	crdtrIban string,
 	crdtBic string,
 	crdtAmnt float64,

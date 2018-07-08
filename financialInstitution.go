@@ -52,7 +52,7 @@ type financialInstitutionProcessing interface {
 	GetAccounts() []Account
 }
 
-func (fi FinancialInstitution) GetAccounts() []Account {
+func (fi *FinancialInstitution) GetAccounts() []Account {
 	var accounts []Account
 
 	accntholders := fi.Customers
