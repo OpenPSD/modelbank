@@ -3,6 +3,7 @@ package providers
 import (
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
+	"github.com/openpsd/modelbank/entities"
 )
 
 func ModelbankDB_Model() {
@@ -16,16 +17,18 @@ func ModelbankDB_Model() {
 		panic(err)
 	}
 
-	/*
-		user1 := &User{
-			Name:   "admin",
-			Emails: []string{"admin1@admin", "admin2@admin"},
-		}
-		err = db.Insert(user1)
-		if err != nil {
-			panic(err)
-		}
+	fi := &entities.FinancialInstitution{
+		Name:         "SampleBank",
+		Country:      "DE",
+		AddressLine1: "Street",
+		AddressLine2: "Addresline 2",
+	}
+	err = db.Insert(fi)
+	if err != nil {
+		panic(err)
+	}
 
+	/*
 		err = db.Insert(&User{
 			Name:   "root",
 			Emails: []string{"root1@root", "root2@root"},
@@ -77,7 +80,7 @@ func ModelbankDB_Model() {
 }
 
 func createSchema(db *pg.DB) error {
-	for _, model := range []interface{}{(*FinancialInstitution)(nil), (*AccountHolder)(nil)} {
+	for _, model := range []interface{}{(*entities.FinancialInstitution)(nil), (*entities.AccountHolder)(nil)} {
 		err := db.CreateTable(model, &orm.CreateTableOptions{
 			Temp: true,
 		})
