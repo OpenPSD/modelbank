@@ -8,7 +8,8 @@ import (
 
 func ModelbankDB_Model() {
 	db := pg.Connect(&pg.Options{
-		User: "postgres",
+		User:     "postgres",
+		Password: "start123",
 	})
 	defer db.Close()
 
@@ -82,7 +83,7 @@ func ModelbankDB_Model() {
 func createSchema(db *pg.DB) error {
 	for _, model := range []interface{}{(*entities.FinancialInstitution)(nil), (*entities.AccountHolder)(nil)} {
 		err := db.CreateTable(model, &orm.CreateTableOptions{
-			Temp: true,
+			Temp: false,
 		})
 		if err != nil {
 			return err
