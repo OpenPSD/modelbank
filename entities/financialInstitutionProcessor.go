@@ -1,4 +1,4 @@
-package modelbank
+package entities
 
 import "time"
 

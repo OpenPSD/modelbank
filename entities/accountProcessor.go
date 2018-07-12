@@ -1,4 +1,4 @@
-package modelbank
+package entities
 
 type accountProcessor interface {
 	setLimit(value float64)

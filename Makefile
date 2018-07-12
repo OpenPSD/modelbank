@@ -1,12 +1,19 @@
 GO_CMD             ?= go
 GO_DEP_CMD         ?= dep
-APP_NAME        ?= modelbank
+APP_NAME        	 ?= modelbank
 
 install-dependencies:
-	@echo "install dependencies..."
+	@echo "Install dependencies..."
 	$(GO_CMD) get ./...
 
-build: install-dependencies
-	@echo "build $(APP_NAME)"
-	$(GO_CMD) build
+install: install-dependencies
+	@echo "Install $(APP_NAME)"
+	$(GO_CMD) install
 
+run: install
+	@echo "Run $(APP_NAME)"
+	$(APP_NAME)
+
+tests:
+	@echo "Run tests"
+	$(GO_CMD) test ./...
