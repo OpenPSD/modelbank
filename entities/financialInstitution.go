@@ -2,7 +2,6 @@ package modelbank
 
 import (
 	"encoding/json"
-	"time"
 )
 
 type FinancialInstitution struct {
@@ -18,38 +17,35 @@ type FinancialInstitution struct {
 	Customers                   []*AccountHolder      `json:"customers"`
 }
 
-type financialInstitutionProcessing interface {
-	onboardPerson(name string,
-		address string,
-		dateOfBirth time.Time,
-		cityOfBirth string,
-		countryOfBirth string) *AccountHolder
+func (fi *FinancialInstitution) receivePaymentInstruction(paymentInstruction PaymentInstruction) {
+	fi.ReceivedPaymentInstructions = append(fi.ReceivedPaymentInstructions, &paymentInstruction)
+}
+func (fi *FinancialInstitution) processIncomingPaymentInstructions() {
+	openInstrustions := fi.ReceivedPaymentInstructions
+	for i := 0; i < len(openInstrustions); i++ {
+		pi := openInstrustions[i]
+		txs := pi.Transactions
+		for j := 0; j < len(txs); j++ {
+			tx := txs[0]
+			iban := tx.CreditorAccount.Iban
+			ac := fi.GetAccount(iban)
+			le := NewLedgerEntry(ac)
+			le.EntryAmount = tx.Amount
+			le.EntryDate = pi.RequestedExecutionDate
+			le.EntryTitle = tx.Purpose
+			ac.Balance = ac.Balance - le.EntryAmount
+			ac.Ledger = append(ac.Ledger, &le)
+			tx.Status = Processed
 
-	onboardOrganisation(name string,
-		address string,
-		tin string) *AccountHolder
+		}
+	}
+}
 
-	// receivePaymentInstruction
-	// receives incoming paymentinstructions from other banks and stores them
-	// for further processing.
-	receivePaymentInstruction(paymentInstruction PaymentInstruction)
+func (fi *FinancialInstitution) GetAccount(iban string) Account {
+	var ac Account
 
-	// sendPaymentInstruction
-	// sends outgoing paymentinstructions to other banks.
-	sendPaymentInstruction(paymentInstruction PaymentInstruction)
+	return ac
 
-	// processIncomingPaymentInstructions
-	// books all received incoming paymentinstructions to corresponding accounts' ledgers.
-	// Incoming paymentinstructions can either be received from other financial institutions or
-	// created by accountholders wihin the same bank.
-	processIncomingPaymentInstructions()
-
-	// createOutgoingPaymentInstructions
-	// takes all existing paymenttransactions created by accountholders and creates
-	// outgoing paymentInstructions. Books all payment transactions on accounts's ledgers.
-	createOutgoingPaymentInstructions()
-
-	GetAccounts() []Account
 }
 
 func (fi *FinancialInstitution) GetAccounts() []Account {

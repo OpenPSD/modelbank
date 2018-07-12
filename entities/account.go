@@ -36,31 +36,6 @@ type Account struct {
 	Status        string         `json:"status"`
 }
 
-type accountProcessing interface {
-	setLimit(value float64)
-	debitAccount(amount float64)
-	creditAccount(amount float64)
-	isAccountCoverageSufficient() bool
-}
-
-type accountHolderProcessing interface {
-	openAccount(accountHolder AccountHolder, currency string) *Account
-
-	closeAccount()
-
-	// intructPayment
-	// This is a credit transfer initiated by accountholder. It
-	// creates a paymenttransaction and stores it in financial institution's
-	// context for further processing.
-	intructPayment(crdtrName string,
-		crdtrIban string,
-		crdtBic string,
-		crdtAmnt float64,
-		crdtCrrncy string,
-		purpose string,
-		reqExecDate time.Time, dbtrAccnt *Account) *PaymentTransaction
-}
-
 func (ah *AccountHolder) instructPayment(crdtrName string,
 	crdtrIban string,
 	crdtBic string,
