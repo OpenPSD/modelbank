@@ -13,7 +13,12 @@ func ModelbankDB_Model() {
 	})
 	defer db.Close()
 
-	err := createSchema(db)
+	err := dropSchema(db)
+	if err != nil {
+		panic(err)
+	}
+
+	err = createSchema(db)
 	if err != nil {
 		panic(err)
 	}
@@ -90,4 +95,17 @@ func createSchema(db *pg.DB) error {
 		}
 	}
 	return nil
+}
+
+func dropSchema(db *pg.DB) error {
+	for _, model := range []interface{}{(*entities.FinancialInstitution)(nil), (*entities.AccountHolder)(nil)} {
+		err := db.DropTable(model, &orm.DropTableOptions{
+			IfExists: true,
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+
 }

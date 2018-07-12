@@ -11,4 +11,6 @@ func main() {
 
 	providers.ModelbankDB_Model()
 
+	log.Println("modelbank's database created")
+
 }
