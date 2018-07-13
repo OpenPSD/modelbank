@@ -3,10 +3,29 @@ package providers
 import (
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
+	"github.com/openpsd/modelbank/controllers"
 	"github.com/openpsd/modelbank/entities"
 )
 
+type DbProvider struct {
+	Db         *pg.DB
+	Controller controller.FinancialInstitutionInputPort
+}
+
+func (db *DbProvider) FindbyBic(bic string) (entities.FinancialInstitution, error) {
+	// Select fi by bic.
+	fi := &entities.FinancialInstitution{}
+	err = db.Select(fi).Where("bic = ?", bic)
+	if err != nil {
+		panic(err)
+	}
+	return fi, err
+}
+
 func ModelbankDB_Model() {
+
+	dbp := DbProvider{}
+
 	db := pg.Connect(&pg.Options{
 		User:     "postgres",
 		Password: "start123",
@@ -22,6 +41,8 @@ func ModelbankDB_Model() {
 	if err != nil {
 		panic(err)
 	}
+	newFi := dbp.Controller.Create()
+	db.Insert(&newFi)
 
 	fi := &entities.FinancialInstitution{
 		Name:         "SampleBank",
