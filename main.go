@@ -13,4 +13,12 @@ func main() {
 
 	log.Println("modelbank's database created")
 
+	repository := providers.NewDbProvider()
+	fi, err := repository.Controller.Create("PBNKDEFF")
+	if err != nil {
+		panic(err)
+	}
+
+	log.Println("fi added: " + fi.Bic)
+
 }

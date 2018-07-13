@@ -9,22 +9,39 @@ import (
 
 type DbProvider struct {
 	Db         *pg.DB
-	Controller controller.FinancialInstitutionInputPort
+	Controller controllers.FinancialInstitutionInputPort
 }
 
-func (db *DbProvider) FindbyBic(bic string) (entities.FinancialInstitution, error) {
+func (dbp DbProvider) FindByBic(bic string) (entities.FinancialInstitution, error) {
+	dbp.Db = pg.Connect(&pg.Options{
+		User:     "postgres",
+		Password: "start123",
+	})
+	defer dbp.Db.Close()
 	// Select fi by bic.
 	fi := &entities.FinancialInstitution{}
-	err = db.Select(fi).Where("bic = ?", bic)
-	if err != nil {
-		panic(err)
-	}
-	return fi, err
+	err := dbp.Db.Model(fi).Where("bic = ?", bic).Select()
+	return *fi, err
+}
+
+func (dbp DbProvider) Store(fi *entities.FinancialInstitution) error {
+	dbp.Db = pg.Connect(&pg.Options{
+		User:     "postgres",
+		Password: "start123",
+	})
+	defer dbp.Db.Close()
+	// Select fi by bic.
+	err := dbp.Db.Insert(fi)
+	return err
+}
+
+func NewDbProvider() DbProvider {
+	dbp := DbProvider{}
+	dbp.Controller = controllers.NewFinancialInstituteController(dbp)
+	return dbp
 }
 
 func ModelbankDB_Model() {
-
-	dbp := DbProvider{}
 
 	db := pg.Connect(&pg.Options{
 		User:     "postgres",
@@ -41,8 +58,6 @@ func ModelbankDB_Model() {
 	if err != nil {
 		panic(err)
 	}
-	newFi := dbp.Controller.Create()
-	db.Insert(&newFi)
 
 	fi := &entities.FinancialInstitution{
 		Name:         "SampleBank",
