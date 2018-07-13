@@ -1,6 +1,8 @@
 package providers
 
 import (
+	"time"
+
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
 	"github.com/openpsd/modelbank/controllers"
@@ -8,11 +10,70 @@ import (
 )
 
 type DbProvider struct {
-	Db         *pg.DB
-	Controller controllers.FinancialInstitutionInputPort
+	Db                  *pg.DB
+	modelbankController controllers.ModelBankController
 }
 
-func (dbp DbProvider) FindByBic(bic string) (entities.FinancialInstitution, error) {
+func (dbp DbProvider) StoreAccnt(accnt *entities.Account) error {
+	dbp.Db = pg.Connect(&pg.Options{
+		User:     "postgres",
+		Password: "start123",
+	})
+	defer dbp.Db.Close()
+	// Select fi by bic.
+	err := dbp.Db.Insert(accnt)
+	return err
+}
+
+func (dbp DbProvider) StoreAccntHldr(accntHldr *entities.AccountHolder) error {
+	dbp.Db = pg.Connect(&pg.Options{
+		User:     "postgres",
+		Password: "start123",
+	})
+	defer dbp.Db.Close()
+	// Select fi by bic.
+	err := dbp.Db.Insert(accntHldr)
+	return err
+}
+
+func (dbp DbProvider) FindAccntByAccntHldr(accntHldr *entities.AccountHolder) ([]entities.Account, error) {
+	dbp.Db = pg.Connect(&pg.Options{
+		User:     "postgres",
+		Password: "start123",
+	})
+	defer dbp.Db.Close()
+	var accnts []entities.Account
+	//FIX SELECT
+	err := dbp.Db.Model(&accnts).Select()
+	return accnts, err
+}
+
+func (dbp DbProvider) FindAccntByIban(iban string) (entities.Account, error) {
+	dbp.Db = pg.Connect(&pg.Options{
+		User:     "postgres",
+		Password: "start123",
+	})
+	defer dbp.Db.Close()
+	accnt := &entities.Account{}
+	err := dbp.Db.Model(accnt).Where("iban = ?", iban).Select()
+	return *accnt, err
+}
+
+func (dbp DbProvider) FindAccntHldrByNameAndBirthDate(name string,
+	birthDate time.Time,
+	fi *entities.FinancialInstitution) ([]entities.AccountHolder, error) {
+	dbp.Db = pg.Connect(&pg.Options{
+		User:     "postgres",
+		Password: "start123",
+	})
+	defer dbp.Db.Close()
+	var accntHldrs []entities.AccountHolder
+	//FIX SELECT
+	err := dbp.Db.Model(&accntHldrs).Where("name = ? AND birth_date= ?", name, birthDate).Select()
+	return accntHldrs, err
+}
+
+func (dbp DbProvider) FindFiByBic(bic string) (entities.FinancialInstitution, error) {
 	dbp.Db = pg.Connect(&pg.Options{
 		User:     "postgres",
 		Password: "start123",
@@ -24,7 +85,7 @@ func (dbp DbProvider) FindByBic(bic string) (entities.FinancialInstitution, erro
 	return *fi, err
 }
 
-func (dbp DbProvider) Store(fi *entities.FinancialInstitution) error {
+func (dbp DbProvider) StoreFi(fi *entities.FinancialInstitution) error {
 	dbp.Db = pg.Connect(&pg.Options{
 		User:     "postgres",
 		Password: "start123",
@@ -37,7 +98,7 @@ func (dbp DbProvider) Store(fi *entities.FinancialInstitution) error {
 
 func NewDbProvider() DbProvider {
 	dbp := DbProvider{}
-	dbp.Controller = controllers.NewFinancialInstituteController(dbp)
+	dbp.modelbankController = controllers.NewModelBankontroller(dbp)
 	return dbp
 }
 
@@ -122,7 +183,9 @@ func ModelbankDB_Model() {
 }
 
 func createSchema(db *pg.DB) error {
-	for _, model := range []interface{}{(*entities.FinancialInstitution)(nil), (*entities.AccountHolder)(nil)} {
+	for _, model := range []interface{}{(*entities.FinancialInstitution)(nil),
+		(*entities.AccountHolder)(nil),
+		(*entities.Account)(nil)} {
 		err := db.CreateTable(model, &orm.CreateTableOptions{
 			Temp: false,
 		})
@@ -134,7 +197,9 @@ func createSchema(db *pg.DB) error {
 }
 
 func dropSchema(db *pg.DB) error {
-	for _, model := range []interface{}{(*entities.FinancialInstitution)(nil), (*entities.AccountHolder)(nil)} {
+	for _, model := range []interface{}{(*entities.FinancialInstitution)(nil),
+		(*entities.AccountHolder)(nil),
+		(*entities.Account)(nil)} {
 		err := db.DropTable(model, &orm.DropTableOptions{
 			IfExists: true,
 		})

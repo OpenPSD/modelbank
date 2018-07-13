@@ -1,6 +1,9 @@
 # OpenPSD Modelbank
 
-A model bank used for openpsd purposes
+A model bank used for openpsd purposes.
+
+Make sure you have PostgreSQL installed.
+
 Note: Work in progress!
 
 ## requirements
