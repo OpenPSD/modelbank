@@ -20,7 +20,6 @@ func (dbp DbProvider) StoreAccnt(accnt *entities.Account) error {
 		Password: "start123",
 	})
 	defer dbp.Db.Close()
-	// Select fi by bic.
 	err := dbp.Db.Insert(accnt)
 	return err
 }
@@ -31,7 +30,6 @@ func (dbp DbProvider) StoreAccntHldr(accntHldr *entities.AccountHolder) error {
 		Password: "start123",
 	})
 	defer dbp.Db.Close()
-	// Select fi by bic.
 	err := dbp.Db.Insert(accntHldr)
 	return err
 }

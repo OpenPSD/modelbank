@@ -4,9 +4,12 @@ import (
 	"time"
 
 	"github.com/openpsd/modelbank/entities"
+	"github.com/openpsd/modelbank/usecases"
 )
 
-type ModelBankOutputPort interface {
+type ModelBankControllerOutputPort interface {
+	ReadTestdata()
+	CreateRepository()
 	FindFiByBic(bic string) (entities.FinancialInstitution, error)
 	FindAccntHldrByNameAndBirthDate(name string,
 		birthDate time.Time,
@@ -19,34 +22,20 @@ type ModelBankOutputPort interface {
 	StoreAccnt(accnt *entities.Account) error
 }
 
-type ModelBankInputPort interface {
-	CreateFi(bic string) (entities.FinancialInstitution, error)
-	CreateAccntHldr(name string,
-		birthDate time.Time,
-		birthCity string,
-		birthCountry string,
-		agent entities.FinancialInstitution) (entities.AccountHolder, error)
-	CreateAccnt(iban string,
-		currency string,
-		accntHldr entities.AccountHolder) (entities.Account, error)
+type ModelBankControllerInputPort interface {
+	InitializeBank()
 }
 
 type ModelBankController struct {
-	outputPort ModelBankOutputPort
+	outputPort ModelBankControllerOutputPort
+	usecase    usecases.ModelBankUsecaseInputPort
 }
 
-func NewModelBankontroller(outPutPort ModelBankOutputPort) ModelBankController {
-	return ModelBankController{
+func NewModelBankontroller(outPutPort ModelBankControllerOutputPort) ModelBankController {
+	cntrlr := ModelBankController{
 		outputPort: outPutPort,
 	}
-}
+	cntrlr.usecase = usecases.NewModelBankUseCase(cntrlr.outputPort)
 
-func (fiController ModelBankController) Create(bic string) (entities.FinancialInstitution, error) {
-	fi, error := fiController.outputPort.FindFiByBic(bic)
-	if error != nil {
-		fi = entities.NewFinancialInstitution()
-		fi.Bic = bic
-		error = fiController.outputPort.StoreFi(&fi)
-	}
-	return fi, error
+	return cntrlr
 }

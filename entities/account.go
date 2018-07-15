@@ -5,6 +5,33 @@ import (
 	"time"
 )
 
+type ConsentAccountEntry struct {
+	Iban      string
+	Bban      string
+	Pan       string
+	MaskedPan string
+	Msisdn    string
+	Currency  string
+}
+type ConsentAccess struct {
+	Accounts          []ConsentAccountEntry
+	Balances          []ConsentAccountEntry
+	Transactions      []ConsentAccountEntry
+	AvailableAccounts string
+	AllPsd2           string
+}
+type Consent struct {
+	ID                 string
+	AccessGrantedToTpp string
+	Access             ConsentAccess
+	RecurringIndicator bool
+	ValidUntil         time.Time
+	FrequencyPerDay    int
+	LastActionDate     time.Time
+	ConsentStatus      string
+	ScaStatus          string
+}
+
 type AccountHolder struct {
 	Agent                 *FinancialInstitution `json:"agent"`
 	Name                  string                `json:"name"`
