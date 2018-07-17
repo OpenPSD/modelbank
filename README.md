@@ -4,6 +4,8 @@ A model bank used for openpsd purposes.
 
 Make sure you have PostgreSQL installed.
 
+This project uses go-pg.
+
 Note: Work in progress!
 
 ## requirements
