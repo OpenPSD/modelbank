@@ -2,6 +2,8 @@
 
 A model bank used for openpsd purposes.
 
+![Solution Architecture](modelbank_solution_architecture.png)
+
 Make sure you have PostgreSQL installed.
 
 This project uses go-pg.
