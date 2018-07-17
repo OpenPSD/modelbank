@@ -6,7 +6,13 @@ import (
 	"github.com/openpsd/modelbank/entities"
 )
 
-type ModelBankUsecaseOutputPort interface {
+type Response struct {
+}
+
+type Request struct {
+}
+
+type ModelBankEntityGateway interface {
 	ReadTestdata()
 	CreateRepository()
 	FindFiByBic(bic string) (entities.FinancialInstitution, error)
@@ -21,8 +27,12 @@ type ModelBankUsecaseOutputPort interface {
 	StoreAccnt(accnt *entities.Account) error
 }
 
+type ModelBankUsecaseOutputPort interface {
+	ReceiveResponse(resp Response)
+}
+
 type ModelBankUsecaseInputPort interface {
-	InitializeBank() error
+	InitializeBank(request Request) error
 	CreateConsent()
 	CreateFi(bic string) (entities.FinancialInstitution, error)
 	CreateAccntHldr(name string,
@@ -35,28 +45,30 @@ type ModelBankUsecaseInputPort interface {
 		accntHldr entities.AccountHolder) (entities.Account, error)
 }
 type ModelBankUseCase struct {
-	outputPort ModelBankUsecaseOutputPort
+	outputPort    ModelBankUsecaseOutputPort
+	entityManager ModelBankEntityGateway
 }
 
-func NewModelBankUseCase(ouput ModelBankUsecaseOutputPort) ModelBankUseCase {
+func NewModelBankUseCase(mngr ModelBankEntityGateway, output ModelBankUsecaseOutputPort) ModelBankUseCase {
 	return ModelBankUseCase{
-		outputPort: ouput,
+		outputPort:    output,
+		entityManager: mngr,
 	}
 }
 
-func (usecase ModelBankUseCase) InitializeBank() error {
+func (usecase ModelBankUseCase) InitializeBank(request Request) error {
 	var err error
-	usecase.outputPort.ReadTestdata()
-	usecase.outputPort.CreateRepository()
+	usecase.entityManager.ReadTestdata()
+	usecase.entityManager.CreateRepository()
 	return err
 }
 
 func (usecase ModelBankUseCase) CreateFi(bic string) (entities.FinancialInstitution, error) {
-	fi, error := usecase.outputPort.FindFiByBic(bic)
+	fi, error := usecase.entityManager.FindFiByBic(bic)
 	if error != nil {
 		fi = entities.NewFinancialInstitution()
 		fi.Bic = bic
-		error = usecase.outputPort.StoreFi(&fi)
+		error = usecase.entityManager.StoreFi(&fi)
 	}
 	return fi, error
 }
