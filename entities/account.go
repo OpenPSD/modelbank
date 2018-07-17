@@ -18,7 +18,7 @@ type ConsentAccess struct {
 	Balances          []ConsentAccountEntry
 	Transactions      []ConsentAccountEntry
 	AvailableAccounts string
-	AllPsd2           string
+	AllPsd2           string // No idea what this is good for ..
 }
 type Consent struct {
 	ID                 string
