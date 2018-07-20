@@ -6,30 +6,31 @@ import (
 )
 
 type ConsentAccountEntry struct {
-	Iban      string
-	Bban      string
-	Pan       string
-	MaskedPan string
-	Msisdn    string
-	Currency  string
+	Iban      string `json:"iban"`
+	Bban      string `json:"bban"`
+	Pan       string `json:"pan"`
+	MaskedPan string `json:"maskedPan"`
+	Msisdn    string `json:"msisdn"`
+	Currency  string `json:"currency"`
 }
 type ConsentAccess struct {
-	Accounts          []ConsentAccountEntry
-	Balances          []ConsentAccountEntry
-	Transactions      []ConsentAccountEntry
-	AvailableAccounts string
-	AllPsd2           string // No idea what this is good for ..
+	Accounts          []ConsentAccountEntry `json:"accounts"`
+	Balances          []ConsentAccountEntry `json:"balances"`
+	Transactions      []ConsentAccountEntry `json:"transactions"`
+	AvailableAccounts string                `json:"availableAccounts"`
+	AllPsd2           string                `json:"allPsd2"`
 }
 type Consent struct {
-	ID                 string
-	AccessGrantedToTpp string
-	Access             ConsentAccess
-	RecurringIndicator bool
-	ValidUntil         time.Time
-	FrequencyPerDay    int
-	LastActionDate     time.Time
-	ConsentStatus      string
-	ScaStatus          string
+	ID                 string        `json:"id"`
+	AccessGrantedToTpp string        `json:"tpp"`
+	TppCertificate     string        `json:"tppCertificate"`
+	Access             ConsentAccess `json:"access"`
+	RecurringIndicator bool          `json:"recurringIndicator"`
+	ValidUntil         time.Time     `json:"validUntil"`
+	FrequencyPerDay    int           `json:"frequencyPerDay"`
+	LastActionDate     time.Time     `json:"lastActionDate"`
+	ConsentStatus      string        `json:"consentStatus"`
+	ScaStatus          string        `json:"scaStatus"`
 }
 
 type AccountHolder struct {
@@ -48,6 +49,7 @@ type AccountHolder struct {
 	IdPersCityOfBirth     string                `json:"birthcity"`
 	IdPersCountryOfBirth  string                `json:"birthcountry"`
 	Accounts              []*Account            `json:"accounts"`
+	UserName              string                `json:"username"`
 }
 
 type Account struct {
@@ -113,6 +115,10 @@ func NewAccountHolder(financialInstitution FinancialInstitution) AccountHolder {
 	}
 }
 
+func NewConsent() Consent {
+	return Consent{}
+}
+
 // Marshal interface implementation
 func (m *AccountHolder) Marshal() ([]byte, error) {
 	if m == nil {
@@ -142,6 +148,24 @@ func (m *Account) Marshal() ([]byte, error) {
 // Unmarshal interface implementation
 func (m *Account) Unmarshal(b []byte) error {
 	var res Account
+	if err := json.Unmarshal(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}
+
+// Marshal interface implementation
+func (m *Consent) Marshal() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return json.Marshal(m)
+}
+
+// Unmarshal interface implementation
+func (m *Consent) Unmarshal(b []byte) error {
+	var res Consent
 	if err := json.Unmarshal(b, &res); err != nil {
 		return err
 	}

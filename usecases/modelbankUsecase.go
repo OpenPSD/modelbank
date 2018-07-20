@@ -7,9 +7,27 @@ import (
 )
 
 type Response struct {
+	container map[string][]byte
+}
+
+func NewResponse() Response {
+	m := make(map[string][]byte)
+	response := Response{
+		container: m,
+	}
+	return response
 }
 
 type Request struct {
+	container map[string][]byte
+}
+
+func NewRequest() Request {
+	m := make(map[string][]byte)
+	request := Request{
+		container: m,
+	}
+	return request
 }
 
 type ModelBankEntityGateway interface {
@@ -22,9 +40,11 @@ type ModelBankEntityGateway interface {
 
 	FindAccntByIban(iban string) (entities.Account, error)
 	FindAccntByAccntHldr(accntHldr *entities.AccountHolder) ([]entities.Account, error)
+	FindCnsntById(id string) (entities.Consent, error)
 	StoreFi(fi *entities.FinancialInstitution) error
 	StoreAccntHldr(accntHldr *entities.AccountHolder) error
 	StoreAccnt(accnt *entities.Account) error
+	StoreCnsnt(cnsnt *entities.Consent) error
 }
 
 type ModelBankUsecaseOutputPort interface {
@@ -33,16 +53,11 @@ type ModelBankUsecaseOutputPort interface {
 
 type ModelBankUsecaseInputPort interface {
 	InitializeBank(request Request) error
-	CreateConsent()
-	CreateFi(bic string) (entities.FinancialInstitution, error)
-	CreateAccntHldr(name string,
-		birthDate time.Time,
-		birthCity string,
-		birthCountry string,
-		agent entities.FinancialInstitution) (entities.AccountHolder, error)
-	CreateAccnt(iban string,
-		currency string,
-		accntHldr entities.AccountHolder) (entities.Account, error)
+	CreateConsent(request Request) (Response, error)
+	GetConsent(id string) (Response, error)
+	CreateFi(bic string) (Response, error)
+	CreateAccntHldr(request Request) (Response, error)
+	CreateAccnt(request Request) (Response, error)
 }
 type ModelBankUseCase struct {
 	outputPort    ModelBankUsecaseOutputPort
@@ -56,47 +71,94 @@ func NewModelBankUseCase(mngr ModelBankEntityGateway, output ModelBankUsecaseOut
 	}
 }
 
-func (usecase ModelBankUseCase) InitializeBank(request Request) error {
+func (usecase *ModelBankUseCase) InitializeBank(request Request) error {
 	var err error
 	usecase.entityManager.ReadTestdata()
 	usecase.entityManager.CreateRepository()
 	return err
 }
 
-func (usecase ModelBankUseCase) CreateFi(bic string) (entities.FinancialInstitution, error) {
-	fi, error := usecase.entityManager.FindFiByBic(bic)
-	if error != nil {
+func (usecase *ModelBankUseCase) CreateFi(bic string) (Response, error) {
+	fi, err := usecase.entityManager.FindFiByBic(bic)
+	if err != nil {
 		fi = entities.NewFinancialInstitution()
 		fi.Bic = bic
-		error = usecase.entityManager.StoreFi(&fi)
+		err = usecase.entityManager.StoreFi(&fi)
 	}
-	return fi, error
+	resp := NewResponse()
+	resp.container["fi"], err = fi.Marshal()
+	return resp, err
 }
 
-func (usecase ModelBankUseCase) CreateAccntHldr(name string,
-	birthDate time.Time,
-	birthCity string,
-	birthCountry string,
-	agent entities.FinancialInstitution) (entities.AccountHolder, error) {
+func (usecase *ModelBankUseCase) CreateAccntHldr(request Request) error {
 	var err error
-	var accntHldr entities.AccountHolder
+
+	/*
+		name string,
+		birthDate time.Time,
+		birthCity string,
+		birthCountry string,
+		agent entities.FinancialInstitution) (entities.AccountHolder, error
+	*/
 	//TODO CODE ME
 
-	return accntHldr, err
+	return err
 
 }
 
-func (usecase ModelBankUseCase) CreateAccnt(iban string,
-	currency string,
-	accntHldr entities.AccountHolder) (entities.Account, error) {
+func (usecase *ModelBankUseCase) CreateAccnt(request Request) error {
+	/*
+		iban string,
+		currency string) (entities.Account, error)
+	*/
 	var err error
-	var accnt entities.Account
 	//TODO CODE ME
 
-	return accnt, err
+	return err
 
 }
 
-func (usecase ModelBankUseCase) CreateConsent() {
+func (usecase *ModelBankUseCase) CreateConsent(request Request) (Response, error) {
+	var err error
+	var response Response
+	consent := entities.NewConsent()
+	err = consent.Unmarshal(request.container["consent"])
+	if err != nil {
+		return response, err
+	}
+	consent, err = usecase.entityManager.FindCnsntById(consent.ID)
+	if err != nil {
+		err = usecase.entityManager.StoreCnsnt(&consent)
+	}
+	resp := NewResponse()
+	resp.container["consent"], err = consent.Marshal()
+	return resp, err
 
 }
+
+/*
+func mapConsent(request Request) (entities.Consent, error) {
+	consent := entities.NewConsent()
+	var err error
+	layout := "2006-01-02T15:04:05.000Z"
+
+	consent.ID = request.container["id"]
+	consent.AccessGrantedToTpp = request.container["accessGrantedToTpp"]
+	consent.ConsentStatus = request.container["consentStatus"]
+
+	fpd := request.container["frequencyPerDay"]
+	consent.FrequencyPerDay, err = strconv.Atoi(fpd)
+
+	consent.LastActionDate, err = time.Parse(layout, request.container["lastActionDate"])
+
+	consent.RecurringIndicator, err = strconv.ParseBool(request.container["recurringIndicator"])
+
+	consent.ScaStatus = request.container["scaStatus"]
+	consent.TppCertificate = request.container["tppCertificate"]
+
+	consent.ValidUntil, err = time.Parse(layout, request.container["validUntil"])
+
+	return consent, err
+
+}
+*/
