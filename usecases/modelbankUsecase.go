@@ -7,25 +7,25 @@ import (
 )
 
 type Response struct {
-	container map[string][]byte
+	Container map[string][]byte
 }
 
 func NewResponse() Response {
 	m := make(map[string][]byte)
 	response := Response{
-		container: m,
+		Container: m,
 	}
 	return response
 }
 
 type Request struct {
-	container map[string][]byte
+	Container map[string][]byte
 }
 
 func NewRequest() Request {
 	m := make(map[string][]byte)
 	request := Request{
-		container: m,
+		Container: m,
 	}
 	return request
 }
@@ -71,14 +71,14 @@ func NewModelBankUseCase(mngr ModelBankEntityGateway, output ModelBankUsecaseOut
 	}
 }
 
-func (usecase *ModelBankUseCase) InitializeBank(request Request) error {
+func (usecase ModelBankUseCase) InitializeBank(request Request) error {
 	var err error
 	usecase.entityManager.ReadTestdata()
 	usecase.entityManager.CreateRepository()
 	return err
 }
 
-func (usecase *ModelBankUseCase) CreateFi(bic string) (Response, error) {
+func (usecase ModelBankUseCase) CreateFi(bic string) (Response, error) {
 	fi, err := usecase.entityManager.FindFiByBic(bic)
 	if err != nil {
 		fi = entities.NewFinancialInstitution()
@@ -86,13 +86,13 @@ func (usecase *ModelBankUseCase) CreateFi(bic string) (Response, error) {
 		err = usecase.entityManager.StoreFi(&fi)
 	}
 	resp := NewResponse()
-	resp.container["fi"], err = fi.Marshal()
+	resp.Container["fi"], err = fi.Marshal()
 	return resp, err
 }
 
-func (usecase *ModelBankUseCase) CreateAccntHldr(request Request) error {
+func (usecase ModelBankUseCase) CreateAccntHldr(request Request) (Response, error) {
 	var err error
-
+	var resp Response
 	/*
 		name string,
 		birthDate time.Time,
@@ -102,27 +102,29 @@ func (usecase *ModelBankUseCase) CreateAccntHldr(request Request) error {
 	*/
 	//TODO CODE ME
 
-	return err
+	return resp, err
 
 }
 
-func (usecase *ModelBankUseCase) CreateAccnt(request Request) error {
+func (usecase ModelBankUseCase) CreateAccnt(request Request) (Response, error) {
 	/*
 		iban string,
 		currency string) (entities.Account, error)
 	*/
 	var err error
+	var resp Response
+
 	//TODO CODE ME
 
-	return err
+	return resp, err
 
 }
 
-func (usecase *ModelBankUseCase) CreateConsent(request Request) (Response, error) {
+func (usecase ModelBankUseCase) CreateConsent(request Request) (Response, error) {
 	var err error
 	var response Response
 	consent := entities.NewConsent()
-	err = consent.Unmarshal(request.container["consent"])
+	err = consent.Unmarshal(request.Container["consent"])
 	if err != nil {
 		return response, err
 	}
@@ -131,9 +133,16 @@ func (usecase *ModelBankUseCase) CreateConsent(request Request) (Response, error
 		err = usecase.entityManager.StoreCnsnt(&consent)
 	}
 	resp := NewResponse()
-	resp.container["consent"], err = consent.Marshal()
+	resp.Container["consent"], err = consent.Marshal()
 	return resp, err
 
+}
+
+func (usecase ModelBankUseCase) GetConsent(id string) (Response, error) {
+	consent, err := usecase.entityManager.FindCnsntById(id)
+	resp := NewResponse()
+	resp.Container["consent"], err = consent.Marshal()
+	return resp, err
 }
 
 /*

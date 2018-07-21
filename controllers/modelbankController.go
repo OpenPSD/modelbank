@@ -12,16 +12,15 @@ type ModelBankControllerInputPort interface {
 }
 
 type ModelBankController struct {
-	entityManager usecases.ModelBankEntityGateway
-	usecase       usecases.ModelBankUsecaseInputPort
+	EntityManager usecases.ModelBankEntityGateway
+	Usecase       usecases.ModelBankUsecaseInputPort
 }
 
 func NewModelBankontroller(mgr usecases.ModelBankEntityGateway) ModelBankController {
 	cntrlr := ModelBankController{
-		entityManager: mgr,
+		EntityManager: mgr,
 	}
-	cntrlr.usecase = usecases.NewModelBankUseCase(cntrlr.entityManager, cntrlr)
-
+	cntrlr.Usecase = usecases.NewModelBankUseCase(cntrlr.EntityManager, cntrlr)
 	return cntrlr
 }
 

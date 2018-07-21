@@ -8,6 +8,11 @@ import fmt "fmt"
 import math "math"
 import timestamp "github.com/golang/protobuf/ptypes/timestamp"
 
+import (
+	context "golang.org/x/net/context"
+	grpc "google.golang.org/grpc"
+)
+
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
@@ -281,6 +286,78 @@ func init() {
 	proto.RegisterType((*Consent)(nil), "providers.Consent")
 	proto.RegisterType((*Consent_Account)(nil), "providers.Consent.Account")
 	proto.RegisterType((*Consent_Access)(nil), "providers.Consent.Access")
+}
+
+// Reference imports to suppress errors if they are not otherwise used.
+var _ context.Context
+var _ grpc.ClientConn
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the grpc package it is being compiled against.
+const _ = grpc.SupportPackageIsVersion4
+
+// ModelBankClient is the client API for ModelBank service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type ModelBankClient interface {
+	CreateConsent(ctx context.Context, in *Consent, opts ...grpc.CallOption) (*Consent, error)
+}
+
+type modelBankClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewModelBankClient(cc *grpc.ClientConn) ModelBankClient {
+	return &modelBankClient{cc}
+}
+
+func (c *modelBankClient) CreateConsent(ctx context.Context, in *Consent, opts ...grpc.CallOption) (*Consent, error) {
+	out := new(Consent)
+	err := c.cc.Invoke(ctx, "/providers.ModelBank/CreateConsent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ModelBankServer is the server API for ModelBank service.
+type ModelBankServer interface {
+	CreateConsent(context.Context, *Consent) (*Consent, error)
+}
+
+func RegisterModelBankServer(s *grpc.Server, srv ModelBankServer) {
+	s.RegisterService(&_ModelBank_serviceDesc, srv)
+}
+
+func _ModelBank_CreateConsent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Consent)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ModelBankServer).CreateConsent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/providers.ModelBank/CreateConsent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ModelBankServer).CreateConsent(ctx, req.(*Consent))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _ModelBank_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "providers.ModelBank",
+	HandlerType: (*ModelBankServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateConsent",
+			Handler:    _ModelBank_CreateConsent_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "modelbank.proto",
 }
 
 func init() { proto.RegisterFile("modelbank.proto", fileDescriptor_modelbank_a3f87e35c54f6826) }

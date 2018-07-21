@@ -11,7 +11,7 @@ import (
 
 type DbProvider struct {
 	Db                  *pg.DB
-	modelbankController controllers.ModelBankController
+	ModelbankController controllers.ModelBankController
 }
 
 func (dbp DbProvider) StoreAccnt(accnt *entities.Account) error {
@@ -82,6 +82,17 @@ func (dbp DbProvider) FindFiByBic(bic string) (entities.FinancialInstitution, er
 	err := dbp.Db.Model(fi).Where("bic = ?", bic).Select()
 	return *fi, err
 }
+func (dbp DbProvider) FindCnsntById(id string) (entities.Consent, error) {
+	dbp.Db = pg.Connect(&pg.Options{
+		User:     "postgres",
+		Password: "start123",
+	})
+	defer dbp.Db.Close()
+	// Select fi by bic.
+	cn := &entities.Consent{}
+	err := dbp.Db.Model(cn).Where("ID = ?", id).Select()
+	return *cn, err
+}
 
 func (dbp DbProvider) StoreFi(fi *entities.FinancialInstitution) error {
 	dbp.Db = pg.Connect(&pg.Options{
@@ -89,14 +100,29 @@ func (dbp DbProvider) StoreFi(fi *entities.FinancialInstitution) error {
 		Password: "start123",
 	})
 	defer dbp.Db.Close()
-	// Select fi by bic.
 	err := dbp.Db.Insert(fi)
 	return err
+}
+func (dbp DbProvider) StoreCnsnt(cnsnt *entities.Consent) error {
+	dbp.Db = pg.Connect(&pg.Options{
+		User:     "postgres",
+		Password: "start123",
+	})
+	defer dbp.Db.Close()
+	err := dbp.Db.Insert(cnsnt)
+	return err
+}
+
+func (dbp DbProvider) ReadTestdata() {
+
+}
+func (dbp DbProvider) CreateRepository() {
+
 }
 
 func NewDbProvider() DbProvider {
 	dbp := DbProvider{}
-	dbp.modelbankController = controllers.NewModelBankontroller(dbp)
+	dbp.ModelbankController = controllers.NewModelBankontroller(dbp)
 	return dbp
 }
 
