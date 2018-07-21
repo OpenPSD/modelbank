@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package providers;
+
+import "google/protobuf/timestamp.proto";
+
+service ModelBank {
+    rpc CreateConsent (Consent) returns (Consent) {}
+}
+
+message Consent {
+    string id = 1;
+    string tpp = 2;
+    string tppCertificate = 3;
+
+    message Account{
+        string iban = 1;
+        string bban = 2;
+        string pan = 3;
+        string maskedPan = 4;
+        string msisdn = 5;
+        string currency = 6;
+    }
+
+    message Access {
+        repeated Account accounts = 1;
+        repeated Account balances = 2;
+        repeated Account transactions = 3;
+        string availableAccounts = 4;
+        string allPsd2 =5;
+    }
+    Access access = 4;
+    bool recurringIndicator = 5;
+    google.protobuf.Timestamp validUntil = 6;
+    int32 frequencyPerDay = 7;
+    google.protobuf.Timestamp lastActionDate = 8;
+    string consentStatus = 9;
+    string scaStatus = 10;
+}
