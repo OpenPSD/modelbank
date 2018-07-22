@@ -15,7 +15,6 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/testdata"
 
-	"github.com/openpsd/modelbank/controllers"
 	"github.com/openpsd/modelbank/entities"
 
 	pb "github.com/openpsd/modelbank/providers"
@@ -30,7 +29,7 @@ var (
 )
 
 type modelbankServer struct {
-	Controller controllers.ModelBankController
+	Controller providers.ModelBankControllerInputPort
 }
 
 func (s *modelbankServer) CreateConsent(ctx context.Context, consent *pb.Consent) (*pb.Consent, error) {
@@ -47,8 +46,11 @@ func (s *modelbankServer) CreateConsent(ctx context.Context, consent *pb.Consent
 
 func newServer() *modelbankServer {
 	repository := providers.NewDbProvider()
-	controller := controllers.NewModelBankontroller(repository)
+	controller := providers.NewModelBankontroller(repository)
 	s := &modelbankServer{Controller: controller}
+	req := usecases.NewRequest()
+	req.Container["config"] = "test"
+	controller.InitializeBank(req)
 	return s
 }
 

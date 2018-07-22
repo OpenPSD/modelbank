@@ -5,13 +5,12 @@ import (
 
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
-	"github.com/openpsd/modelbank/controllers"
 	"github.com/openpsd/modelbank/entities"
 )
 
 type DbProvider struct {
 	Db                  *pg.DB
-	ModelbankController controllers.ModelBankController
+	ModelbankController ModelBankController
 }
 
 func (dbp DbProvider) StoreAccnt(accnt *entities.Account) error {
@@ -117,12 +116,26 @@ func (dbp DbProvider) ReadTestdata() {
 
 }
 func (dbp DbProvider) CreateRepository() {
+	db := pg.Connect(&pg.Options{
+		User:     "postgres",
+		Password: "start123",
+	})
+	defer db.Close()
 
+	err := dropSchema(db)
+	if err != nil {
+		panic(err)
+	}
+
+	err = createSchema(db)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func NewDbProvider() DbProvider {
 	dbp := DbProvider{}
-	dbp.ModelbankController = controllers.NewModelBankontroller(dbp)
+	dbp.ModelbankController = NewModelBankontroller(dbp)
 	return dbp
 }
 
